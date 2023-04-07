@@ -42,7 +42,7 @@ export class LockstepModel<T, K extends Game<T, K>> {
       this.socket.send(JSON.stringify(data))
     }
     playerInput(move: T | null) {
-      const t = this.model!.furthestT
+      const t = this.model!.furthestT+1
       this.sendJSON({type: "moved", msg: {move, t}})
       this.model!.receiveAction(this.player!, move, t)
       this.render(this.model!.renderable)
