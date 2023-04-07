@@ -4,14 +4,16 @@ import { Game, Model } from "./types.ts"
 export class LockstepModel<T, K extends Game<T, K>> {
     private socket!: WebSocket
     private playerObj?: Player<T>
+    private model: Model<T, K> | undefined
     player?: number
-    constructor(private model: Model<T, K>, private render: (state: K)=>void, private onStart: ()=>void, serverURL: string, fps=60) {
+    constructor(getModel: (nPlayers: number)=>Model<T, K>, private render: (state: K)=>void, private onStart: ()=>void, serverURL: string, fps=60) {
       this.socket = new WebSocket(serverURL)
       this.socket.onopen = ()=>{setTimeout(this.ready, 3000)}
       this.socket.onmessage = (e: MessageEvent) => {
         const parsed = JSON.parse(e.data) as {type: string, msg: any}
         switch(parsed.type) {
           case "start": {
+            this.model = getModel(parsed.msg.nPlayers)
             const msg = parsed.msg as {id: number, nPlayers: number}
             this.player = msg.id
             this.onStart()
