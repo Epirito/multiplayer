@@ -1,5 +1,5 @@
 import {serve} from "./deps.ts";
-export async function server(port = 3000) {
+export async function multiplayerServer(port = 3000) {
     const players: {lastMove: number, ready: boolean, emit: (type: string, msg: any)=>void, setId: (newId: number)=>void}[] = []
     let started = false
     let nextId = 0
