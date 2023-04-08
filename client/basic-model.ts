@@ -10,8 +10,8 @@ export class BasicModel<T, K extends Game<T,K>> implements Model<T, K> {
     playersToSpawn: {player: number, name: string, t: number}[] = []
     authoritative: K;
     bufferedRollback = false;
-    constructor(initGame: () => K, nPlayers: number) {
-      this.authoritative = initGame();
+    constructor(initialState: K, nPlayers: number) {
+      this.authoritative = initialState;
       this.players = new Map(Array(nPlayers)
         .fill(0)
         .map((_, i) => [i, new Player(i)]));

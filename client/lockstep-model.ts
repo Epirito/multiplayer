@@ -8,7 +8,6 @@ export class LockstepModel<T, K extends Game<T, K>> {
     player?: number
     constructor(getModel: (nPlayers: number)=>Model<T, K>, private render: (state: K)=>void, private onStart: ()=>void, serverURL: string, fps=60) {
       this.socket = new WebSocket(serverURL)
-      this.socket.onopen = ()=>{setTimeout(this.ready, 3000)}
       this.socket.onmessage = (e: MessageEvent) => {
         const parsed = JSON.parse(e.data) as {type: string, msg: any}
         switch(parsed.type) {
