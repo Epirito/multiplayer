@@ -1,7 +1,7 @@
 import { Player } from "./player.ts"
 import { Game, Model } from "./types.ts"
 
-export class LockstepModel<T, K extends Game<T, K>> {
+export class LockstepClient<T, K extends Game<T, K>> {
     private socket!: WebSocket
     private playerObj?: Player<T>
     private model: Model<T, K> | undefined

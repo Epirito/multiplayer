@@ -15,3 +15,7 @@ export interface Model<T, K extends Game<T, K>> {
     get furthestT(): number
     get renderable(): K
 }
+export interface Client<T, K extends Game<T, K>> {
+    playerInput(move: T | null): void
+    get renderable(): K
+}
