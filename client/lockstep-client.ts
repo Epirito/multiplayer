@@ -1,11 +1,11 @@
 import { Player } from "./player.ts"
-import { Game, Model } from "./types.ts"
+import { Game, Model, Client } from "./types.ts"
 
-export class LockstepClient<T, K extends Game<T, K>> {
+export class LockstepClient<T, K extends Game<T, K>> implements Client<T, K> {
     private socket!: WebSocket
     private playerObj?: Player<T>
     private model: Model<T, K> | undefined
-    player?: number
+    player: number | undefined
     constructor(getModel: (nPlayers: number)=>Model<T, K>, private render: (state: K)=>void, private onStart: ()=>void, serverURL: string, fps=60) {
       this.socket = new WebSocket(serverURL)
       this.socket.onmessage = (e: MessageEvent) => {
