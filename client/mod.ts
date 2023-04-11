@@ -1,4 +1,4 @@
-export {type Game, type Model} from "./types.ts"
+export {type Game, type Model, type Client} from "./types.ts"
 export {BasicModel} from "./basic-model.ts"
 export {LockstepClient} from "./lockstep-client.ts"
 export {SingleplayerClient} from "./singleplayer-client.ts"
