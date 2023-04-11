@@ -18,4 +18,5 @@ export interface Model<T, K extends Game<T, K>> {
 export interface Client<T, K extends Game<T, K>> {
     playerInput(move: T | null): void
     get renderable(): K
+    get player(): number
 }
