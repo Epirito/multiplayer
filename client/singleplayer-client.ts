@@ -8,10 +8,12 @@ export class SingleplayerClient<T, K extends Game<T, K>> implements Client<T, K>
     private game!: K
     constructor(getGame: (nPlayers: number)=>K, private render: (state: K)=>void, private onStart: ()=>void, fps=60,) {
         this.game = getGame(1)
-            this.onStart()
-            setInterval(() => {
-              this.playerInput(null)
-            }, 1000 / fps)
+            setTimeout(()=>{
+                this.onStart()
+                setInterval(() => {
+                this.playerInput(null)
+                }, 1000 / fps)
+            }, 0)
     }
     playerInput(move: T | null) {
         if (move!==null) { 
