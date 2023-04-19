@@ -6,6 +6,7 @@ export interface Game<T, K extends Game<T, K>> {
     spawn?(player: number): void;
     despawn?(player: number): void;
     copy(): K;
+    serialize?(): unknown;
     get t(): number
 }
 export interface Model<T, K extends Game<T, K>> {

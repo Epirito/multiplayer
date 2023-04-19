@@ -7,7 +7,7 @@ import { Model } from "./types.ts";
 export class BasicModel<T, K extends Game<T,K>> implements Model<T, K> {
     readonly players: Map<number, Player<T>>;
     playersToDelete: {player: number, t: number}[] = []
-    playersToSpawn: {player: number, name: string, t: number}[] = []
+    playersToSpawn: {player: number, t: number}[] = []
     authoritative: K;
     bufferedRollback = false;
     constructor(initialState: K, nPlayers: number) {
@@ -26,9 +26,9 @@ export class BasicModel<T, K extends Game<T,K>> implements Model<T, K> {
         }
         break
         case 'spawn': {
-          const {player, name, t} = data as {player: number, name: string, t: number}
+          const {player, t} = data as {player: number, t: number}
           this.players.set(player, new Player(player))
-          this.playersToSpawn.push({player, name, t})
+          this.playersToSpawn.push({player, t})
         }
       }
     }

@@ -29,14 +29,19 @@ export class TicTacToe implements Game<number, TicTacToe> {
       const copy = new TicTacToe();
       copy.state = structuredClone(this.state);
       return copy;
-    }  
+    }
+    serialize(): unknown {
+      return this.state;
+    }
     get t() {
       return this.state.t;
     }
   }
-  
-  
-  
+export function deserialize(state: unknown) {
+    const game = new TicTacToe();
+    game.state = state as TicTacToeState;
+    return game;
+}
   
   
   

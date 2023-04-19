@@ -6,13 +6,13 @@ export class SingleplayerClient<T, K extends Game<T, K>> implements Client<T, K>
     private socket!: WebSocket
     private playerObj?: Player<T>
     private game!: K
-    constructor(getGame: (nPlayers: number)=>K, private render: (state: K)=>void, private onStart: ()=>void, fps=60,) {
+    constructor(getGame: (nPlayers: number)=>K, private render: (state: K)=>void, private onStart: ()=>void, frameProvider = (f: ()=>void)=>{setInterval(f, 1000/60)}) {
         this.game = getGame(1)
             setTimeout(()=>{
                 this.onStart()
-                setInterval(() => {
-                this.playerInput(null)
-                }, 1000 / fps)
+                frameProvider(()=>{
+                    this.playerInput(null)
+                })
             }, 0)
     }
     playerInput(move: T | null) {

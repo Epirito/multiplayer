@@ -1,6 +1,11 @@
+import { Client, Game, Model } from "../client/mod.ts";
 import {serve} from "./deps.ts";
-export async function multiplayerServer(port = 3000) {
-    const players: {lastMove: number, ready: boolean, emit: (type: string, msg: any)=>void, setId: (newId: number)=>void}[] = []
+export async function multiplayerServer<T,K extends Game<T,K>>(port = 3000, model?: Model<T,K>) {
+    const players: Map<number, {
+        lastMove: number, 
+        ready: boolean, 
+        emit: (type: string, msg: any)=>void
+    }> = new Map()
     let started = false
     let nextId = 0
     function emit(type: string, msg: any) {
@@ -16,33 +21,36 @@ export async function multiplayerServer(port = 3000) {
         socket.onopen = ()=>{
             console.log("connected")
             if (started) {
-                socket.send("already_started")
-                socket.close()
-                return
+                if (model?.renderable.serialize) {
+                    socket.send(JSON.stringify({type: "world", msg: model.renderable.serialize()}))
+                    emit("meta", {type: "spawn", player: nextId, t: model.renderable.t})
+                }else {
+                    socket.send("already_started")
+                    socket.close()
+                    return
+                }
             }
-            let id = nextId
-            players[id] = {
+            const id = nextId
+            players.set(id, {
                 ready: false, 
                 lastMove: 0,
                 emit(type: string, msg: any) {
                     socket.send(JSON.stringify({type, msg}))
-                },
-                setId: (newId: number) => {
-                    id = newId
                 }
-            }
+            })
             nextId += 1
-            socket.onclose = ()=> {
-                players.splice(id, 1)
-                for(let i = id; i < players.length; i++) {
-                    players[i].setId(i)
-                }
-                emit("meta", {type: "delete", player: id, t: players[id].lastMove+1})
+            const kick = ()=> {
+                if (!players.has(id)) return
+                const lastMove = players.get(id)!.lastMove
+                players.delete(id)
+                emit("meta", {type: "delete", player: id, t: lastMove+1})
+                model?.receiveMetaAction("delete", {player: id, t: lastMove+1})
             }
-            socket.onerror = console.log
+            socket.onclose = kick
+            socket.onerror = kick
             socket.onmessage = (e)=>{
                 if (e.data==="ready") {
-                    players[id]!.ready = true
+                    players.get(id)!.ready = true
                     players.forEach((player)=> {
                         if (!player.ready) {
                             emit("ready", id)
@@ -53,18 +61,19 @@ export async function multiplayerServer(port = 3000) {
                         started = true
                         player.emit("start", {
                             id: respectiveId,
-                            nPlayers: players.length
+                            nPlayers: players.size
                         })
                     })
                 }else if (e.data==="not_ready") {
-                    players[id].ready = false
+                    players.get(id)!.ready = false
                     emit("not_ready", id)
                 }else {
                     const parsed = JSON.parse(e.data)
                     switch(parsed.type) {
                         case "moved":
-                            players[id].lastMove = parsed.msg.t
+                            players.get(id)!.lastMove = parsed.msg.t
                             emit("moved", {player: id, move: parsed.msg.move, t: parsed.msg.t})
+                            model?.receiveAction(id, parsed.msg.move, parsed.msg.t)
                     }
                 }
             }
