@@ -12,6 +12,7 @@ export class SingleplayerClient<T, K extends Game<T, K>> implements Client<T, K>
                 this.onStart()
                 frameProvider(()=>{
                     this.playerInput(null)
+                    this.render(this.game)
                 })
             }, 0)
     }
@@ -20,7 +21,6 @@ export class SingleplayerClient<T, K extends Game<T, K>> implements Client<T, K>
             this.game.makeMove(this.player, move)
         }
         this.game.tick()
-        this.render(this.game)
     }
     get player() {
         return 0
